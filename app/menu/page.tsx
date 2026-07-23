@@ -6,7 +6,9 @@ import Image from "next/image";
 import { useCart } from "@/app/context/CartContext";
 import { supabase } from "@/app/lib/supabase";
 import type { Product } from "@/app/data/products";
-export default function MenuPage() {
+import { connection } from "next/server";
+export default async function MenuPage() {
+  await connection()
   const { addToCart } = useCart();
   const searchParams = useSearchParams();
 
