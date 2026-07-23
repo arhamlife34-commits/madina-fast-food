@@ -176,16 +176,23 @@ useEffect(() => {
   };
 }, []);
   useEffect(() => {
-    const loggedIn = localStorage.getItem("adminLoggedIn");
+  checkAdmin();
 
-    if (loggedIn !== "true") {
+  async function checkAdmin() {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session) {
       router.replace("/login");
-    } else {
-      setLoading(false);
-      fetchDashboardStats();
-      fetchNotifications();
+      return;
     }
-  }, [router]);
+
+    setLoading(false);
+    fetchDashboardStats();
+    fetchNotifications();
+  }
+}, [router]);
 
   if (loading) {
     return (
@@ -264,10 +271,10 @@ useEffect(() => {
     </div>
 
     <button
-      onClick={() => {
-        localStorage.removeItem("adminLoggedIn");
-        router.push("/login");
-      }}
+     onClick={async () => {
+  await supabase.auth.signOut();
+  router.push("/login");
+}}
       className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-bold"
     >
       Logout

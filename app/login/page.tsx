@@ -1,25 +1,40 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/app/lib/supabase";
 
 export default function LoginPage() {
   const router = useRouter();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  useEffect(() => {
+  checkSession();
 
-  function login() {
-    if (
-      email === "adminfaizi@madinafastfood.com" &&
-      password === "khuzan05865"
-    ) {
-      localStorage.setItem("adminLoggedIn", "true");
+  async function checkSession() {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
 
-      router.push("/admin");
-    } else {
-      alert("Invalid Email or Password");
+    if (session) {
+      router.replace("/admin");
     }
+  }
+}, [router]);
+
+  async function login() {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      alert("Invalid Email or Password");
+      return;
+    }
+
+    router.push("/admin");
   }
 
   return (
