@@ -5,7 +5,19 @@ export type Product = {
   image: string;
   description: string;
   price: number;
+  regular_price?: number;
+large_price?: number;
+jumbo_price?: number;
+
+small_price?: number;
+medium_price?: number;
+
+cheese_price?: number;
+fries_price?: number;
   isDeal: boolean;
+  selectedSize?: string; 
+  selectedAddon?: string;
+addonPrice?: number;
 };
 export const products: Product[] = [
   {
@@ -15,7 +27,7 @@ export const products: Product[] = [
     image: "/images/burger.jpg",
     description: "Crispy chicken fillet with lettuce & mayo",
     price: 450,
-    is_Deal: true,
+    isDeal: true,
   },
   {
     id: 2,
@@ -24,7 +36,7 @@ export const products: Product[] = [
     image: "/images/burger.jpg",
     description: "Double zinger with hash brown & cheese",
     price: 520,
-    is_Deal: true,
+    isDeal: true,
   },
   {
     id: 3,
@@ -33,7 +45,7 @@ export const products: Product[] = [
     image: "/images/burger.jpg",
     description: "Double beef patty with cheese",
     price: 550,
-    is_Deal: false,
+    isDeal: false,
   },
   {
     id: 4,
@@ -42,7 +54,7 @@ export const products: Product[] = [
     image: "/images/shawarma.jpg",
     description: "Fresh tortilla with grilled chicken",
     price: 320,
-    is_Deal: false,
+    isDeal: false,
   },
   {
     id: 5,
@@ -51,7 +63,7 @@ export const products: Product[] = [
     image: "/images/pizza.jpg",
     description: "Loaded cheese pizza",
     price: 850,
-    is_Deal: true,
+    isDeal: true,
   },
   {
     id: 6,
@@ -60,7 +72,7 @@ export const products: Product[] = [
     image: "/images/fries.jpg",
     description: "Golden crispy fries",
     price: 200,
-    is_Deal: false,
+    isDeal: false,
   },
   {
     id: 7,
@@ -69,7 +81,7 @@ export const products: Product[] = [
     image: "/images/fries.jpg",
     description: "Cheese loaded fries",
     price: 380,
-    is_Deal: false,
+    isDeal: false,
   },
   {
     id: 8,
@@ -78,6 +90,6 @@ export const products: Product[] = [
     image: "/images/platter.jpg",
     description: "Chicken with fries & drink",
     price: 950,
-    is_Deal: false,
+    isDeal: false,
   },
 ];

@@ -13,7 +13,7 @@ export default function About() {
           <div className="relative overflow-hidden rounded-3xl shadow-2xl">
 
             <Image
-              src="/images/about.jpg"
+              src="/images/about.jpg.jpg"
               alt="About Madina Fast Food"
               width={700}
               height={700}
@@ -104,7 +104,7 @@ export default function About() {
               <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition">
 
                 <h3 className="text-4xl font-bold text-red-600">
-                  10+
+                  15+
                 </h3>
 
                 <p className="mt-2 text-gray-600">

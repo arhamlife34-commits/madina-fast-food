@@ -117,7 +117,19 @@ onOrdersChanged();
         return "bg-gray-100 text-gray-700";
     }
   }
+const filteredOrders = orders.filter((order) => {
+  const matchSearch =
+    order.customer_name
+      .toLowerCase()
+      .includes(search.toLowerCase()) ||
+    order.phone.includes(search);
 
+  const matchStatus =
+    selectedStatus === "All" ||
+    order.status === selectedStatus;
+
+  return matchSearch && matchStatus;
+});
   if (loading) {
     return (
       <div className="bg-white p-8 rounded-2xl shadow-lg">
@@ -167,20 +179,29 @@ onOrdersChanged();
             <div className="space-y-3">
 
               {selectedOrder.order_items?.map((item, index) => (
-                <div
-                  key={index}
-                  className="flex justify-between border rounded-xl p-3"
-                >
-                  <span>
-                    {item.name} × {item.quantity}
-                  </span>
+  <div
+    key={index}
+    className="flex justify-between border rounded-xl p-3"
+  >
 
-                  <span>
-                    Rs. {item.price * item.quantity}
-                  </span>
-                </div>
-              ))}
+    <span>
+      {item.name}
 
+      {item.selectedSize && (
+        <span className="text-red-600 ml-2 font-semibold">
+          ({item.selectedSize})
+        </span>
+      )}
+
+      {" × "}{item.quantity}
+    </span>
+
+    <span>
+      Rs. {item.price * item.quantity}
+    </span>
+
+  </div>
+))}
             </div>
 
             <hr className="my-6" />
@@ -211,10 +232,41 @@ onOrdersChanged();
       <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
 
         <div className="p-6 border-b">
-          <h2 className="text-3xl font-bold">
-            Customer Orders
-          </h2>
-        </div>
+
+  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+    <h2 className="text-3xl font-bold">
+      Customer Orders
+    </h2>
+
+    <div className="flex gap-3">
+
+      <input
+        type="text"
+        placeholder="Search Customer / Phone..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="border rounded-xl px-4 py-2 w-72"
+      />
+
+      <select
+        value={selectedStatus}
+        onChange={(e) => setSelectedStatus(e.target.value)}
+        className="border rounded-xl px-4 py-2"
+      >
+        <option value="All">All</option>
+        <option value="Pending">Pending</option>
+        <option value="Preparing">Preparing</option>
+        <option value="On The Way">On The Way</option>
+        <option value="Delivered">Delivered</option>
+        <option value="Cancelled">Cancelled</option>
+      </select>
+
+    </div>
+
+  </div>
+
+</div>
 
         <table className="w-full">
 
@@ -236,7 +288,7 @@ onOrdersChanged();
 
           <tbody>
 
-            {orders.map((order) => (
+            {filteredOrders.map((order) => (
 
               <tr
                 key={order.id}

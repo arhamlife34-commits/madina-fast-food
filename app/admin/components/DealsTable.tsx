@@ -67,11 +67,8 @@ function startEdit(deal: Deal) {
   setEditName(deal.name);
   setEditPrice(deal.price);
   setEditDescription(deal.description);
-
   setEditImage(deal.image);
-
   setEditImageFile(null);
-
 }
 async function saveDeal() {
 
@@ -129,9 +126,27 @@ async function saveDeal() {
 
   fetchDeals();
 }
-  useEffect(() => {
-    fetchDeals();
-  }, []);  return (
+ useEffect(() => {
+  fetchDeals();
+}, []);
+
+return (
+  <>
+    <EditDealModal
+      deal={editingDeal}
+      editName={editName}
+      setEditName={setEditName}
+      editPrice={editPrice}
+      setEditPrice={setEditPrice}
+      editDescription={editDescription}
+      setEditDescription={setEditDescription}
+      currentImage={editImage}
+      editImageFile={editImageFile}
+      setEditImageFile={setEditImageFile}
+      onSave={saveDeal}
+      onCancel={() => setEditingDeal(null)}
+    />
+
     <div className="bg-white rounded-2xl shadow-lg mt-10 overflow-hidden">
 
       <div className="p-6 border-b">
@@ -206,10 +221,11 @@ async function saveDeal() {
                 <div className="flex justify-center gap-3">
 
                   <button
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg"
-                  >
-                    Edit
-                  </button>
+  onClick={() => startEdit(deal)}
+  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+>
+  Edit
+</button>
 
                   <button
                     onClick={() => deleteDeal(deal.id)}
@@ -230,6 +246,7 @@ async function saveDeal() {
 
       </table>
 
-    </div>
-  );
+        </div>
+  </>
+);
 }

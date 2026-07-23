@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/app/lib/supabase";
+import { FaFacebookF, FaInstagram, FaTiktok } from "react-icons/fa";
 export default function Footer(){
 const [settings, setSettings] = useState<any>(null);
 
@@ -57,27 +58,27 @@ Fresh Food • Fast Delivery • Premium Taste
     href={settings?.facebook}
     target="_blank"
     rel="noopener noreferrer"
-    className="hover:text-red-500"
+    className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center hover:bg-blue-600 hover:text-white transition duration-300"
   >
-    Facebook
+    <FaFacebookF size={22} />
   </a>
 
   <a
     href={settings?.instagram}
     target="_blank"
     rel="noopener noreferrer"
-    className="hover:text-red-500"
+    className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center hover:bg-pink-600 hover:text-white transition duration-300"
   >
-    Instagram
+    <FaInstagram size={22} />
   </a>
 
   <a
     href={settings?.tiktok}
     target="_blank"
     rel="noopener noreferrer"
-    className="hover:text-red-500"
+    className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center hover:bg-gray-800 hover:text-white transition duration-300"
   >
-    TikTok
+    <FaTiktok size={22} />
   </a>
 
 </div>

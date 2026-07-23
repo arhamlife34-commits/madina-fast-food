@@ -80,10 +80,10 @@ async function fetchSettings() {
 
           <div className="lg:col-span-2 space-y-6">
 
-            {cart.map((item) => (
+           {cart.map((item, index) => (
 
               <div
-                key={item.id}
+                key={`${item.id}-${item.selectedSize}-${item.selectedAddon}-${index}`}
                 className="bg-white rounded-2xl shadow-lg p-5 flex gap-5 items-center"
               >
 
@@ -104,6 +104,17 @@ async function fetchSettings() {
                   <h2 className="text-2xl font-bold">
                     {item.name}
                   </h2>
+                  {item.selectedSize && (
+  <p className="text-gray-500 font-semibold mt-1">
+    Size: {item.selectedSize}
+  </p>
+)}
+{item.selectedAddon && (
+  <p className="text-green-600 font-semibold mt-1">
+    + {item.selectedAddon}
+    {item.addonPrice ? ` (+Rs. ${item.addonPrice})` : ""}
+  </p>
+)}
 
                   <p className="text-red-600 font-bold mt-2">
                     Rs. {item.price}
@@ -112,7 +123,13 @@ async function fetchSettings() {
                   <div className="flex items-center gap-3 mt-5">
 
                     <button
-                      onClick={() => decreaseQty(item.id)}
+                     onClick={() =>
+  decreaseQty(
+  item.id,
+  item.selectedSize,
+  item.selectedAddon
+)
+}
                       className="bg-gray-200 w-10 h-10 rounded-lg"
                     >
                       -
@@ -123,7 +140,13 @@ async function fetchSettings() {
                     </span>
 
                     <button
-                      onClick={() => increaseQty(item.id)}
+                     onClick={() =>
+ increaseQty(
+  item.id,
+  item.selectedSize,
+  item.selectedAddon
+)
+}
                       className="bg-gray-200 w-10 h-10 rounded-lg"
                     >
                       +
@@ -138,13 +161,25 @@ async function fetchSettings() {
                   <p className="font-bold text-2xl">
                     Rs. {item.price * item.quantity}
                   </p>
+                  
 
                   <button
-                    onClick={() => removeFromCart(item.id)}
-                    className="mt-5 text-red-600 font-bold hover:underline"
-                  >
-                    Remove
-                  </button>
+  onClick={() => {
+    console.log(
+      "REMOVE CLICK:",
+      item.id,
+      item.selectedSize
+    );
+removeFromCart(
+  item.id,
+  item.selectedSize,
+  item.selectedAddon
+);
+  }}
+  className="mt-5 text-red-600 font-bold hover:underline"
+>
+  Remove
+</button>
 
                 </div>
 

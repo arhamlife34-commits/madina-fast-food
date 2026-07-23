@@ -7,6 +7,15 @@ export default function AddProductForm() {
   const [name, setName] = useState("");
   const [category, setCategory] = useState("Burger");
   const [price, setPrice] = useState("");
+  const [regularPrice, setRegularPrice] = useState("");
+const [largePrice, setLargePrice] = useState("");
+const [jumboPrice, setJumboPrice] = useState("");
+
+const [smallPrice, setSmallPrice] = useState("");
+const [mediumPrice, setMediumPrice] = useState("");
+
+const [cheesePrice, setCheesePrice] = useState("");
+const [friesPrice, setFriesPrice] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [description, setDescription] = useState("");
   const [isDeal, setIsDeal] = useState(false);
@@ -32,8 +41,9 @@ if (imageFile) {
 
   const { error: uploadError } = await supabase.storage
     .from("products")
-    .upload(fileName, imageFile);
-
+    .upload(fileName, imageFile, {
+  upsert: false,
+});
   if (uploadError) {
   setLoading(false);
   alert("Image Upload Failed!");
@@ -52,13 +62,25 @@ if (imageFile) {
       .from("products")
       .insert([
         {
-          name,
-          category,
-          price: Number(price),
-          image: imageUrl,
-          description,
-          is_deal: isDeal,
-        },
+  name,
+  category,
+
+  price: Number(price),
+
+  regular_price: regularPrice ? Number(regularPrice) : null,
+  large_price: largePrice ? Number(largePrice) : null,
+  jumbo_price: jumboPrice ? Number(jumboPrice) : null,
+
+  small_price: smallPrice ? Number(smallPrice) : null,
+  medium_price: mediumPrice ? Number(mediumPrice) : null,
+
+  cheese_price: cheesePrice ? Number(cheesePrice) : 0,
+  fries_price: friesPrice ? Number(friesPrice) : 0,
+
+  image: imageUrl,
+  description,
+  is_deal: isDeal,
+}
       ]);
 
     setLoading(false);
@@ -77,7 +99,11 @@ if (imageFile) {
    setImageFile(null);
     setDescription("");
     setIsDeal(false);
+const fileInput = document.getElementById("product-image") as HTMLInputElement;
 
+if (fileInput) {
+  fileInput.value = "";
+}
     // Refresh page so ProductsTable updates automatically
     window.location.reload();
   }
@@ -105,10 +131,13 @@ if (imageFile) {
           className="border rounded-xl p-4"
         >
           <option>Burger</option>
-          <option>Pizza</option>
-          <option>Shawarma</option>
-          <option>Fries</option>
-          <option>Platter</option>
+<option>Pizza</option>
+<option>Shawarma</option>
+<option>Fries</option>
+<option>Platter</option>
+<option>Pratha Roll</option>
+<option>Special Sandwich</option>
+<option>Special Grill Items</option>
         </select>
 
         <input
@@ -118,12 +147,133 @@ if (imageFile) {
           onChange={(e) => setPrice(e.target.value)}
           className="border rounded-xl p-4"
         />
+{/* Shawarma */}
 
+{category === "Shawarma" && (
+  <>
+    <input
+      type="number"
+      placeholder="Regular Price"
+      value={regularPrice}
+      onChange={(e) => setRegularPrice(e.target.value)}
+      className="border rounded-xl p-4"
+    />
+
+    <input
+      type="number"
+      placeholder="Large Price"
+      value={largePrice}
+      onChange={(e) => setLargePrice(e.target.value)}
+      className="border rounded-xl p-4"
+    />
+
+    <input
+      type="number"
+      placeholder="Jumbo Price"
+      value={jumboPrice}
+      onChange={(e) => setJumboPrice(e.target.value)}
+      className="border rounded-xl p-4"
+    />
+
+    <input
+      type="number"
+      placeholder="Cheese Slice Price"
+      value={cheesePrice}
+      onChange={(e) => setCheesePrice(e.target.value)}
+      className="border rounded-xl p-4"
+    />
+  </>
+)}
+
+{/* Pizza */}
+
+{category === "Pizza" && (
+  <>
+    <input
+      type="number"
+      placeholder="Small Price"
+      value={smallPrice}
+      onChange={(e) => setSmallPrice(e.target.value)}
+      className="border rounded-xl p-4"
+    />
+
+    <input
+      type="number"
+      placeholder="Medium Price"
+      value={mediumPrice}
+      onChange={(e) => setMediumPrice(e.target.value)}
+      className="border rounded-xl p-4"
+    />
+
+    <input
+      type="number"
+      placeholder="Large Price"
+      value={largePrice}
+      onChange={(e) => setLargePrice(e.target.value)}
+      className="border rounded-xl p-4"
+    />
+  </>
+)}
+
+{/* Burger + Platter + Sandwich + Grill */}
+
+{["Burger","Platter","Special Sandwich","Special Grill Items"].includes(category) && (
+  <>
+    <input
+      type="number"
+      placeholder="Cheese Slice Price"
+      value={cheesePrice}
+      onChange={(e) => setCheesePrice(e.target.value)}
+      className="border rounded-xl p-4"
+    />
+
+    {category === "Burger" && (
+      <input
+        type="number"
+        placeholder="Fries Price"
+        value={friesPrice}
+        onChange={(e) => setFriesPrice(e.target.value)}
+        className="border rounded-xl p-4"
+      />
+    )}
+  </>
+)}
+
+{/* Pratha Roll */}
+
+{category === "Pratha Roll" && (
+  <>
+    <input
+      type="number"
+      placeholder="Regular Price"
+      value={regularPrice}
+      onChange={(e) => setRegularPrice(e.target.value)}
+      className="border rounded-xl p-4"
+    />
+
+    <input
+      type="number"
+      placeholder="Large Price"
+      value={largePrice}
+      onChange={(e) => setLargePrice(e.target.value)}
+      className="border rounded-xl p-4"
+    />
+
+    <input
+      type="number"
+      placeholder="Cheese Slice Price"
+      value={cheesePrice}
+      onChange={(e) => setCheesePrice(e.target.value)}
+      className="border rounded-xl p-4"
+    />
+  </>
+)}
         <div className="flex flex-col gap-2">
 
   <input
-    type="file"
-    accept="image/*"
+  id="product-image"
+  type="file"
+  accept="image/*"
     onChange={(e) => {
       if (e.target.files && e.target.files[0]) {
         setImageFile(e.target.files[0]);

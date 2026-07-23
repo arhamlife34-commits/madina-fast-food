@@ -9,11 +9,21 @@ type Product = {
   name: string;
   category: string;
   price: number;
+
+  regular_price?: number;
+  large_price?: number;
+  jumbo_price?: number;
+
+  small_price?: number;
+  medium_price?: number;
+
+  cheese_price?: number;
+  fries_price?: number;
+
   description: string;
   image: string;
   is_deal: boolean;
 };
-
 export default function ProductsTable() {
 
   const [products, setProducts] = useState<Product[]>([]);
@@ -27,6 +37,15 @@ export default function ProductsTable() {
   const [editName, setEditName] = useState("");
   const [editCategory, setEditCategory] = useState("");
   const [editPrice, setEditPrice] = useState(0);
+  const [editRegularPrice, setEditRegularPrice] = useState(0);
+const [editLargePrice, setEditLargePrice] = useState(0);
+const [editJumboPrice, setEditJumboPrice] = useState(0);
+
+const [editSmallPrice, setEditSmallPrice] = useState(0);
+const [editMediumPrice, setEditMediumPrice] = useState(0);
+
+const [editCheesePrice, setEditCheesePrice] = useState(0);
+const [editFriesPrice, setEditFriesPrice] = useState(0);
   const [editDescription, setEditDescription] = useState("");
 
   const [editImage, setEditImage] = useState("");
@@ -35,7 +54,6 @@ export default function ProductsTable() {
   const [editImageFile, setEditImageFile] =
     useState<File | null>(null);
 
-  const [editDeal, setEditDeal] = useState(false);
 
   async function fetchProducts() {
     const { data, error } = await supabase
@@ -81,6 +99,15 @@ export default function ProductsTable() {
   setEditName(product.name);
   setEditCategory(product.category);
   setEditPrice(product.price);
+  setEditRegularPrice(product.regular_price || 0);
+setEditLargePrice(product.large_price || 0);
+setEditJumboPrice(product.jumbo_price || 0);
+
+setEditSmallPrice(product.small_price || 0);
+setEditMediumPrice(product.medium_price || 0);
+
+setEditCheesePrice(product.cheese_price || 0);
+setEditFriesPrice(product.fries_price || 0);
   setEditDescription(product.description);
 
   // Current image
@@ -89,7 +116,6 @@ export default function ProductsTable() {
   // New image reset
   setEditImageFile(null);
 
-  setEditDeal(product.is_deal);
 }
 
   async function saveProduct() {
@@ -133,9 +159,18 @@ export default function ProductsTable() {
         name: editName,
         category: editCategory,
         price: editPrice,
+        regular_price: editRegularPrice,
+large_price: editLargePrice,
+jumbo_price: editJumboPrice,
+
+small_price: editSmallPrice,
+medium_price: editMediumPrice,
+
+cheese_price: editCheesePrice,
+fries_price: editFriesPrice,
         description: editDescription,
         image: imageUrl,
-        is_deal: editDeal,
+      
       })
       .eq("id", editingProduct.id);
 
@@ -174,6 +209,26 @@ const filteredProducts = products.filter((product) => {
   editCategory={editCategory}
   setEditCategory={setEditCategory}
   editPrice={editPrice}
+  editRegularPrice={editRegularPrice}
+setEditRegularPrice={setEditRegularPrice}
+
+editLargePrice={editLargePrice}
+setEditLargePrice={setEditLargePrice}
+
+editJumboPrice={editJumboPrice}
+setEditJumboPrice={setEditJumboPrice}
+
+editSmallPrice={editSmallPrice}
+setEditSmallPrice={setEditSmallPrice}
+
+editMediumPrice={editMediumPrice}
+setEditMediumPrice={setEditMediumPrice}
+
+editCheesePrice={editCheesePrice}
+setEditCheesePrice={setEditCheesePrice}
+
+editFriesPrice={editFriesPrice}
+setEditFriesPrice={setEditFriesPrice}
   setEditPrice={setEditPrice}
   editDescription={editDescription}
   setEditDescription={setEditDescription}
@@ -182,8 +237,6 @@ editImageFile={editImageFile}
 setEditImageFile={setEditImageFile}
 currentImage={editImage}
 
-editDeal={editDeal}
-  setEditDeal={setEditDeal}
   onSave={saveProduct}
   onCancel={() => setEditingProduct(null)}
 />
@@ -214,11 +267,14 @@ editDeal={editDeal}
         className="border rounded-xl px-4 py-2"
       >
         <option value="All">All</option>
-        <option value="Burger">Burger</option>
-        <option value="Pizza">Pizza</option>
-        <option value="Shawarma">Shawarma</option>
-        <option value="Fries">Fries</option>
-        <option value="Platter">Platter</option>
+<option value="Burger">Burger</option>
+<option value="Pizza">Pizza</option>
+<option value="Shawarma">Shawarma</option>
+<option value="Fries">Fries</option>
+<option value="Platter">Platter</option>
+<option value="Pratha Roll">Pratha Roll</option>
+<option value="Special Sandwich">Special Sandwich</option>
+<option value="Special Grill Items">Special Grill Items</option>
       </select>
 
     </div>

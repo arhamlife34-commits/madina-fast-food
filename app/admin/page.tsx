@@ -12,6 +12,7 @@ import DealsTable from "./components/DealsTable";
 import SettingsForm from "./components/SettingsForm";
 import GalleryManager from "./components/GalleryManager";
 import ReviewsTable from "./components/ReviewsTable";
+
 type Stats = {
   totalOrders: number;
   totalProducts: number;
@@ -29,8 +30,11 @@ export default function AdminPage() {
   const router = useRouter();
 
   const [loading, setLoading] = useState(true);
-
+ const [notifications, setNotifications] = useState(0);
+const [showNotifications, setShowNotifications] = useState(false);
+const [pendingOrders, setPendingOrders] = useState<any[]>([]);
   const [stats, setStats] = useState<Stats>({
+
     totalOrders: 0,
     totalProducts: 0,
     totalDeals: 0,
@@ -113,6 +117,16 @@ const todayRevenue = orders
       todayRevenue: todayRevenue,
     });
   }
+  async function fetchNotifications() {
+  const { data } = await supabase
+    .from("orders")
+    .select("*")
+    .eq("status", "Pending")
+    .order("created_at", { ascending: false });
+
+  setPendingOrders(data || []);
+  setNotifications(data?.length || 0);
+}
 useEffect(() => {
   const channel = supabase
     .channel("dashboard-live")
@@ -126,6 +140,7 @@ useEffect(() => {
       },
       () => {
         fetchDashboardStats();
+        fetchNotifications();
       }
     )
 
@@ -168,6 +183,7 @@ useEffect(() => {
     } else {
       setLoading(false);
       fetchDashboardStats();
+      fetchNotifications();
     }
   }, [router]);
 
@@ -185,24 +201,81 @@ useEffect(() => {
     <section className="min-h-screen bg-gray-100 py-32">
       <div className="max-w-7xl mx-auto px-6">
 
-        <div className="flex justify-between items-center mb-10">
+       <div className="flex justify-between items-center mb-10">
 
-          <h1 className="text-5xl font-bold">
-            Admin Dashboard
-          </h1>
+  <h1 className="text-5xl font-bold">
+    Admin Dashboard
+  </h1>
 
-          <button
-            onClick={() => {
-              localStorage.removeItem("adminLoggedIn");
-              router.push("/login");
-            }}
-            className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-bold"
-          >
-            Logout
-          </button>
+  <div className="flex items-center gap-4">
+
+    <div className="relative">
+
+      <button
+        onClick={() =>
+          setShowNotifications(!showNotifications)
+        }
+        className="bg-white shadow-lg px-4 py-3 rounded-xl text-2xl"
+      >
+        🔔
+      </button>
+
+      {notifications > 0 && (
+        <span className="absolute -top-2 -right-2 bg-red-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">
+          {notifications}
+        </span>
+      )}
+
+      {showNotifications && (
+        <div className="absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-2xl border z-50">
+
+          <div className="p-4 border-b font-bold">
+            Pending Orders
+          </div>
+
+          {pendingOrders.length === 0 ? (
+            <p className="p-4 text-gray-500">
+              No Pending Orders
+            </p>
+          ) : (
+            pendingOrders.map((order) => (
+              <div
+                key={order.id}
+                className="p-4 border-b hover:bg-gray-50"
+              >
+                <h4 className="font-bold">
+                  {order.customer_name}
+                </h4>
+
+                <p className="text-sm text-gray-500">
+                  Rs. {order.total}
+                </p>
+
+                <p className="text-xs text-red-600">
+                  {order.status}
+                </p>
+              </div>
+            ))
+          )}
 
         </div>
+      )}
 
+    </div>
+
+    <button
+      onClick={() => {
+        localStorage.removeItem("adminLoggedIn");
+        router.push("/login");
+      }}
+      className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-bold"
+    >
+      Logout
+    </button>
+
+  </div>
+
+</div>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
 
           <div className="bg-white rounded-2xl shadow-lg p-6">

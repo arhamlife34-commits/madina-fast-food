@@ -11,8 +11,8 @@ export default function LoginPage() {
 
   function login() {
     if (
-      email === "admin@madinafastfood.com" &&
-      password === "12345678"
+      email === "adminfaizi@madinafastfood.com" &&
+      password === "khuzan05865"
     ) {
       localStorage.setItem("adminLoggedIn", "true");
 

@@ -1,11 +1,12 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { supabase } from "@/app/lib/supabase";
 
 export default function GalleryManager() {
   const [gallery, setGallery] = useState<any[]>([]);
   const [title, setTitle] = useState("");
-  const [image, setImage] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   useEffect(() => {
     fetchGallery();
@@ -21,17 +22,35 @@ export default function GalleryManager() {
   }
 
   async function addImage() {
-    if (!title || !image) {
+    if (!title || !imageFile) {
       alert("Fill all fields");
       return;
     }
+
+    const fileName = `${Date.now()}-${imageFile.name}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("gallery")
+      .upload(fileName, imageFile);
+
+    if (uploadError) {
+      alert("Upload Failed");
+      console.error(uploadError);
+      return;
+    }
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage
+      .from("gallery")
+      .getPublicUrl(fileName);
 
     const { error } = await supabase
       .from("gallery")
       .insert([
         {
           title,
-          image,
+          image: publicUrl,
         },
       ]);
 
@@ -42,7 +61,14 @@ export default function GalleryManager() {
     }
 
     setTitle("");
-    setImage("");
+    setImageFile(null);
+
+    // Reset file input
+    const input = document.getElementById(
+      "gallery-file"
+    ) as HTMLInputElement;
+
+    if (input) input.value = "";
 
     fetchGallery();
   }
@@ -70,16 +96,26 @@ export default function GalleryManager() {
         <input
           placeholder="Image Title"
           value={title}
-          onChange={(e)=>setTitle(e.target.value)}
+          onChange={(e) => setTitle(e.target.value)}
           className="border rounded-xl p-4"
         />
 
         <input
-          placeholder="Image URL"
-          value={image}
-          onChange={(e)=>setImage(e.target.value)}
-          className="border rounded-xl p-4"
+          id="gallery-file"
+          type="file"
+          accept="image/*"
+          onChange={(e) =>
+            setImageFile(e.target.files?.[0] || null)
+          }
+          className="hidden"
         />
+
+        <label
+          htmlFor="gallery-file"
+          className="border rounded-xl p-4 cursor-pointer bg-gray-100 hover:bg-gray-200 text-center font-medium"
+        >
+          {imageFile ? imageFile.name : "Choose Image"}
+        </label>
 
       </div>
 
@@ -92,7 +128,7 @@ export default function GalleryManager() {
 
       <div className="grid md:grid-cols-3 gap-6 mt-10">
 
-        {gallery.map((item)=>(
+        {gallery.map((item) => (
           <div
             key={item.id}
             className="border rounded-xl overflow-hidden shadow"
@@ -110,7 +146,7 @@ export default function GalleryManager() {
               </h3>
 
               <button
-                onClick={()=>deleteImage(item.id)}
+                onClick={() => deleteImage(item.id)}
                 className="mt-4 bg-red-600 text-white px-4 py-2 rounded-lg"
               >
                 Delete

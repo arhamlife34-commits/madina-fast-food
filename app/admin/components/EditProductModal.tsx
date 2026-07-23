@@ -7,6 +7,15 @@ type Product = {
   image: string;
   description: string;
   price: number;
+  regular_price?: number;
+large_price?: number;
+jumbo_price?: number;
+
+small_price?: number;
+medium_price?: number;
+
+cheese_price?: number;
+fries_price?: number;
   is_deal: boolean;
 };
 
@@ -21,6 +30,26 @@ type Props = {
 
   editPrice: number;
   setEditPrice: (v: number) => void;
+  editRegularPrice: number;
+setEditRegularPrice: (v: number) => void;
+
+editLargePrice: number;
+setEditLargePrice: (v: number) => void;
+
+editJumboPrice: number;
+setEditJumboPrice: (v: number) => void;
+
+editSmallPrice: number;
+setEditSmallPrice: (v: number) => void;
+
+editMediumPrice: number;
+setEditMediumPrice: (v: number) => void;
+
+editCheesePrice: number;
+setEditCheesePrice: (v: number) => void;
+
+editFriesPrice: number;
+setEditFriesPrice: (v: number) => void;
 
   editDescription: string;
   setEditDescription: (v: string) => void;
@@ -29,9 +58,6 @@ type Props = {
   setEditImageFile: (v: File | null) => void;
 
   currentImage: string;
-
-  editDeal: boolean;
-  setEditDeal: (v: boolean) => void;
 
   onSave: () => void;
   onCancel: () => void;
@@ -48,7 +74,26 @@ export default function EditProductModal({
 
   editPrice,
   setEditPrice,
+editRegularPrice,
+setEditRegularPrice,
 
+editLargePrice,
+setEditLargePrice,
+
+editJumboPrice,
+setEditJumboPrice,
+
+editSmallPrice,
+setEditSmallPrice,
+
+editMediumPrice,
+setEditMediumPrice,
+
+editCheesePrice,
+setEditCheesePrice,
+
+editFriesPrice,
+setEditFriesPrice,
   editDescription,
   setEditDescription,
 
@@ -56,9 +101,6 @@ export default function EditProductModal({
   setEditImageFile,
 
   currentImage,
-
-  editDeal,
-  setEditDeal,
 
   onSave,
   onCancel,
@@ -77,7 +119,9 @@ export default function EditProductModal({
           <h2 className="text-3xl font-bold">
             Edit Product
           </h2>
-
+<p className="text-red-600">
+  Category: {editCategory}
+</p>
           <button
             onClick={onCancel}
             className="text-2xl font-bold text-gray-500 hover:text-red-600 transition"
@@ -98,12 +142,20 @@ export default function EditProductModal({
             className="w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
-          <input
-            value={editCategory}
-            onChange={(e) => setEditCategory(e.target.value)}
-            placeholder="Category"
-            className="w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          <select
+  value={editCategory}
+  onChange={(e) => setEditCategory(e.target.value)}
+  className="w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+>
+  <option>Burger</option>
+  <option>Pizza</option>
+  <option>Shawarma</option>
+  <option>Fries</option>
+  <option>Platter</option>
+  <option>Pratha Roll</option>
+  <option>Special Sandwich</option>
+  <option>Special Grill Items</option>
+</select>
 
           <input
             type="number"
@@ -112,7 +164,125 @@ export default function EditProductModal({
             placeholder="Price"
             className="w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+{/* Shawarma */}
 
+{editCategory.trim().toLowerCase() === "shawarma" && (
+  <>
+    <input
+      type="number"
+      placeholder="Regular Price"
+      value={editRegularPrice}
+      onChange={(e) => setEditRegularPrice(Number(e.target.value))}
+      className="w-full border rounded-xl px-4 py-3"
+    />
+
+    <input
+      type="number"
+      placeholder="Large Price"
+      value={editLargePrice}
+      onChange={(e) => setEditLargePrice(Number(e.target.value))}
+      className="w-full border rounded-xl px-4 py-3"
+    />
+
+    <input
+      type="number"
+      placeholder="Jumbo Price"
+      value={editJumboPrice}
+      onChange={(e) => setEditJumboPrice(Number(e.target.value))}
+      className="w-full border rounded-xl px-4 py-3"
+    />
+
+    <input
+      type="number"
+      placeholder="Cheese Slice Price"
+      value={editCheesePrice}
+      onChange={(e) => setEditCheesePrice(Number(e.target.value))}
+      className="w-full border rounded-xl px-4 py-3"
+    />
+  </>
+)}
+
+{/* Pizza */}
+
+{editCategory.trim().toLowerCase() === "pizza" && (
+  <>
+    <input
+      type="number"
+      placeholder="Small Price"
+      value={editSmallPrice}
+      onChange={(e) => setEditSmallPrice(Number(e.target.value))}
+      className="w-full border rounded-xl px-4 py-3"
+    />
+
+    <input
+      type="number"
+      placeholder="Medium Price"
+      value={editMediumPrice}
+      onChange={(e) => setEditMediumPrice(Number(e.target.value))}
+      className="w-full border rounded-xl px-4 py-3"
+    />
+
+    <input
+      type="number"
+      placeholder="Large Price"
+      value={editLargePrice}
+      onChange={(e) => setEditLargePrice(Number(e.target.value))}
+      className="w-full border rounded-xl px-4 py-3"
+    />
+  </>
+)}
+
+{/* Burger */}
+
+{editCategory === "Burger" && (
+  <>
+    <input
+      type="number"
+      placeholder="Cheese Slice Price"
+      value={editCheesePrice}
+      onChange={(e) => setEditCheesePrice(Number(e.target.value))}
+      className="w-full border rounded-xl px-4 py-3"
+    />
+
+    <input
+      type="number"
+      placeholder="Fries Price"
+      value={editFriesPrice}
+      onChange={(e) => setEditFriesPrice(Number(e.target.value))}
+      className="w-full border rounded-xl px-4 py-3"
+    />
+  </>
+)}
+
+{/* Pratha Roll */}
+
+{editCategory === "Pratha Roll" && (
+  <>
+    <input
+      type="number"
+      placeholder="Regular Price"
+      value={editRegularPrice}
+      onChange={(e) => setEditRegularPrice(Number(e.target.value))}
+      className="w-full border rounded-xl px-4 py-3"
+    />
+
+    <input
+      type="number"
+      placeholder="Large Price"
+      value={editLargePrice}
+      onChange={(e) => setEditLargePrice(Number(e.target.value))}
+      className="w-full border rounded-xl px-4 py-3"
+    />
+
+    <input
+      type="number"
+      placeholder="Cheese Slice Price"
+      value={editCheesePrice}
+      onChange={(e) => setEditCheesePrice(Number(e.target.value))}
+      className="w-full border rounded-xl px-4 py-3"
+    />
+  </>
+)}
           <textarea
             value={editDescription}
             onChange={(e) => setEditDescription(e.target.value)}
@@ -155,18 +325,6 @@ export default function EditProductModal({
 
           </div>
 
-          <label className="flex items-center gap-3 font-medium">
-
-            <input
-              type="checkbox"
-              checked={editDeal}
-              onChange={(e) => setEditDeal(e.target.checked)}
-              className="w-5 h-5"
-            />
-
-            Featured Deal
-
-          </label>
 
         </div>
 

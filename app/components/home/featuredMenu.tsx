@@ -1,81 +1,127 @@
 "use client";
-import Image from "next/image";
-import { products } from "@/app/data/products";
-import { useCart } from "@/app/context/CartContext";
-export default function FeaturedMenu() {
-  const { addToCart } = useCart();
-  const items = products;
 
+import Image from "next/image";
+import Link from "next/link";
+
+const categories = [
+  {
+    name: "Burger",
+    title: "Signature Burgers",
+    image: "/categories/burger.jpg",
+    emoji: "🍔",
+  },
+  {
+    name: "Pizza",
+    title: "Stone Baked Pizza",
+    image: "/categories/pizza.jpg",
+    emoji: "🍕",
+  },
+  {
+    name: "Shawarma",
+    title: "Special Shawarma",
+    image: "/categories/shawarma.jpg",
+    emoji: "🌯",
+  },
+  {
+    name: "Fries",
+    title: "Loaded Fries",
+    image: "/categories/fries.jpg",
+    emoji: "🍟",
+  },
+  {
+    name: "Platter",
+    title: "Family Platters",
+    image: "/categories/platter.jpg",
+    emoji: "🍗",
+  },
+  {
+    name: "Pratha Roll",
+    title: "Pratha Rolls",
+    image: "/categories/pratha.jpg",
+    emoji: "🌮",
+  },
+  {
+    name: "Special Sandwich",
+    title: "Club Sandwiches",
+    image: "/categories/sandwich.jpg",
+    emoji: "🥪",
+  },
+  {
+    name: "Special Grill Items",
+    title: "Grill Specials",
+    image: "/categories/grill.jpg",
+    emoji: "🔥",
+  },
+];
+
+export default function FeaturedMenu() {
   return (
-    <section className="py-24 bg-gray-100">
+    <section className="py-24 bg-white">
 
       <div className="max-w-7xl mx-auto px-6">
 
-        <div className="text-center mb-14">
+        <div className="text-center mb-16">
 
-          <h2 className="text-5xl font-bold">
-            Featured Menu
+         <h2 className="text-5xl font-bold text-center">
+            Browse Our Menu
           </h2>
 
           <p className="text-gray-500 mt-4 text-lg">
-            Our Most Popular Items
+            Choose Your Favourite Category
           </p>
 
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
 
-          {items.map((item) => (
+          {categories.map((category) => (
 
-            <div
-              key={item.id}
-              className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:-translate-y-2 transition duration-300"
+            <Link
+              key={category.name}
+              href={`/menu?category=${encodeURIComponent(category.name)}`}
+              className="group"
             >
 
-              <div className="relative h-56">
+             <div className="relative overflow-hidden rounded-3xl bg-white shadow-lg hover:shadow-2xl hover:-translate-y-2 transition duration-300">
+                <div className="relative h-72 overflow-hidden">
 
-                <Image
-                  src={item.image}
-                  alt={item.name}
-                  fill
-                  className="object-cover"
-                />
+                  <Image
+                    src={category.image}
+                    alt={category.title}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
 
-              </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
-              <div className="p-6">
+                  <div className="absolute bottom-6 left-6">
 
-                <h3 className="text-2xl font-bold">
+                    <div className="text-5xl mb-2">
+                      {category.emoji}
+                    </div>
 
-                  {item.name}
+                    <h3 className="text-white text-3xl font-bold">
+                      {category.title}
+                    </h3>
 
-                </h3>
+                  </div>
 
-                <p className="text-gray-500 mt-3">
+                </div>
 
-                  {item.description}
-
-                </p>
-
-                <div className="flex justify-between items-center mt-6">
-
-                  <span className="text-2xl font-bold text-red-600">
-
-                    {item.price}
-
+               <div className="p-5 flex items-center justify-between bg-white">
+                 <span className="font-bold text-lg text-gray-800">
+                    Explore Menu
                   </span>
 
-                  <button
-  onClick={() => addToCart(item)}
-  className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg font-bold transition"
->
-  Add
-</button>
+                  <div className="w-12 h-12 rounded-full bg-red-600 text-white flex items-center justify-center text-xl transition-all duration-300 group-hover:bg-red-700 group-hover:translate-x-2">
+                    →
+                  </div>
+
                 </div>
 
               </div>
 
-            </div>
+            </Link>
 
           ))}
 

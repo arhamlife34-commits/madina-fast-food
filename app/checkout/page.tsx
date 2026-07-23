@@ -72,11 +72,29 @@ async function placeOrder() {
   orderText += `%0A🍽️ *Order Details*%0A`;
 
   cart.forEach((item) => {
-    orderText += `• ${item.name} × ${item.quantity} = Rs. ${
-      item.price * item.quantity
-    }%0A`;
-  });
 
+  orderText += `• ${item.name}`;
+
+  if (
+    item.selectedSize &&
+    item.selectedSize !== "Cheese" &&
+    item.selectedSize !== "Fries"
+  ) {
+    orderText += ` (${item.selectedSize})`;
+  }
+
+  orderText += ` × ${item.quantity}%0A`;
+
+  if (item.selectedAddon) {
+  orderText += `   + ${item.selectedAddon}`;
+
+  if (item.addonPrice) {
+    orderText += ` (+Rs. ${item.addonPrice})`;
+  }
+
+  orderText += `%0A`;
+}
+});
   orderText += `%0A------------------------%0A`;
   orderText += `Subtotal: Rs. ${subtotal}%0A`;
   orderText += `Delivery: Rs. ${delivery}%0A`;
@@ -230,23 +248,46 @@ return (
 
             <div className="space-y-4">
 
-              {cart.map((item)=>(
+              {cart.map((item, index)=>(
 
-                <div
-                  key={item.id}
-                  className="flex justify-between"
-                >
-                  <span>
-                    {item.name} × {item.quantity}
-                  </span>
+  <div
+    key={index}
+    className="flex justify-between"
+  >
 
-                  <span>
-                    Rs. {item.price * item.quantity}
-                  </span>
+    <div>
 
-                </div>
+  <span className="font-semibold">
+    {item.name}
 
-              ))}
+    {item.selectedSize && (
+  <span className="text-red-600 ml-2">
+    ({item.selectedSize})
+  </span>
+)}
+
+    {" × "}
+    {item.quantity}
+  </span>
+
+  {item.selectedAddon && (
+  <p className="text-sm text-green-600">
+    + {item.selectedAddon}
+    {item.addonPrice
+      ? ` (+Rs. ${item.addonPrice})`
+      : ""}
+  </p>
+)}
+
+</div>
+
+    <span>
+      Rs. {item.price * item.quantity}
+    </span>
+
+  </div>
+
+))}
 
               <hr />
 
