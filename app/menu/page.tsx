@@ -1,12 +1,20 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { Suspense, useMemo, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { useCart } from "@/app/context/CartContext";
 import { supabase } from "@/app/lib/supabase";
 import type { Product } from "@/app/data/products";
 export default function MenuPage() {
+  return (
+    <Suspense fallback={<div>Loading Menu...</div>}>
+      <MenuContent />
+    </Suspense>
+  );
+}
+
+function MenuContent() {
   const { addToCart } = useCart();
   const searchParams = useSearchParams();
 
