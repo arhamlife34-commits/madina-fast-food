@@ -52,11 +52,16 @@ const [selectedAddon, setSelectedAddon] = useState<{
       .order("id");
 
     if (error) {
-      console.error(error);
-      return;
-    }
+  alert(JSON.stringify(error));
+  console.error(error);
+  return;
+}
+
+console.log("PRODUCTS:", data);
+alert("Products fetched: " + (data?.length || 0));
 
     setProducts(data || []);
+    alert("Products fetched: " + data?.length);
     setLoading(false);
   }
 
@@ -73,14 +78,16 @@ const [selectedAddon, setSelectedAddon] = useState<{
 ];
 
   const filteredProducts = useMemo(() => {
+    alert("Category = " + category);
     return products.filter((product) => {
       const matchSearch = product.name
         .toLowerCase()
         .includes(search.toLowerCase());
 
       const matchCategory =
-        category === "All" || product.category === category;
-
+  category.toLowerCase() === "all" ||
+  product.category?.trim().toLowerCase() === category.trim().toLowerCase();
+console.log(products.map(p => p.category));
       return matchSearch && matchCategory;
     });
   }, [products, search, category]);
