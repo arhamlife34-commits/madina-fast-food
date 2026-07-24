@@ -4,6 +4,7 @@ import { useCart } from "@/app/context/CartContext";
 import Link from "next/link";
 
 import { useEffect, useState } from "react";
+import { Menu, X } from "lucide-react";
 import { supabase } from "@/app/lib/supabase";
 
 export default function Navbar() {
@@ -29,7 +30,7 @@ async function fetchSettings() {
     (total, item) => total + item.quantity,
     0
   );
-
+const [mobileMenu, setMobileMenu] = useState(false);
 
   return (
 
@@ -67,55 +68,26 @@ async function fetchSettings() {
 
 
         {/* Navigation */}
-<nav
-  className="
-    flex-1
-    overflow-x-auto
-    whitespace-nowrap
-    mx-3
-    lg:mx-6
-    scrollbar-hide
-  "
->
+<nav className="hidden lg:flex flex-1 justify-center gap-8 font-semibold text-gray-700">
 
-  <div className="flex gap-5 lg:gap-8 font-semibold text-gray-700 w-max text-sm lg:text-base">
+  <Link href="/" className="hover:text-red-600">Home</Link>
 
-    <Link href="/" className="hover:text-red-600">
-      Home
-    </Link>
+  <Link href="/menu" className="hover:text-red-600">Menu</Link>
 
-    <Link href="/menu" className="hover:text-red-600">
-      Menu
-    </Link>
+  <Link href="/deals" className="hover:text-red-600">Deals</Link>
 
-    <Link href="/deals" className="hover:text-red-600">
-      Deals
-    </Link>
+  <Link href="/gallery" className="hover:text-red-600">Gallery</Link>
 
-    <Link href="/gallery" className="hover:text-red-600">
-      Gallery
-    </Link>
+  <Link href="/reviews" className="hover:text-red-600">Reviews</Link>
 
-    <Link href="/reviews" className="hover:text-red-600">
-      Reviews
-    </Link>
+  <Link href="/about" className="hover:text-red-600">About</Link>
 
-    <Link href="/about" className="hover:text-red-600">
-      About
-    </Link>
-
-    <Link href="/contact" className="hover:text-red-600">
-      Contact
-    </Link>
-
-  </div>
+  <Link href="/contact" className="hover:text-red-600">Contact</Link>
 
 </nav>
-
         {/* Right Side */}
 
         <div className="flex items-center gap-2 lg:gap-4">
-
 
           {/* Cart Button */}
 
@@ -152,7 +124,12 @@ async function fetchSettings() {
 >
   Call Now
 </a>
-
+<button
+  onClick={() => setMobileMenu(!mobileMenu)}
+  className="lg:hidden p-2"
+>
+  {mobileMenu ? <X size={28} /> : <Menu size={28} />}
+</button>
 
         </div>
 
@@ -160,7 +137,69 @@ async function fetchSettings() {
 
       </div>
 
+{mobileMenu && (
 
+  <div className="lg:hidden bg-white shadow-xl border-t">
+
+    <Link
+      href="/"
+      onClick={() => setMobileMenu(false)}
+      className="block px-6 py-4 border-b"
+    >
+      Home
+    </Link>
+
+    <Link
+      href="/menu"
+      onClick={() => setMobileMenu(false)}
+      className="block px-6 py-4 border-b"
+    >
+      Menu
+    </Link>
+
+    <Link
+      href="/deals"
+      onClick={() => setMobileMenu(false)}
+      className="block px-6 py-4 border-b"
+    >
+      Deals
+    </Link>
+
+    <Link
+      href="/gallery"
+      onClick={() => setMobileMenu(false)}
+      className="block px-6 py-4 border-b"
+    >
+      Gallery
+    </Link>
+
+    <Link
+      href="/reviews"
+      onClick={() => setMobileMenu(false)}
+      className="block px-6 py-4 border-b"
+    >
+      Reviews
+    </Link>
+
+    <Link
+      href="/about"
+      onClick={() => setMobileMenu(false)}
+      className="block px-6 py-4 border-b"
+    >
+      About
+    </Link>
+
+    <Link
+      href="/contact"
+      onClick={() => setMobileMenu(false)}
+      className="block px-6 py-4"
+    >
+      Contact
+    </Link>
+
+  </div>
+
+)}
     </header>
 
   );
