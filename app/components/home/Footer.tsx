@@ -5,7 +5,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6 text-center">
 
         <h2 className="text-4xl font-bold text-red-500">
-          Madina Fast Food
+          Sabzazar Fast Food
         </h2>
 
         <p className="mt-4 text-gray-400">
@@ -22,7 +22,7 @@ export default function Footer() {
         </div>
 
         <p className="mt-8 text-gray-500">
-          © 2026 Madina Fast Food. All Rights Reserved.
+          © 2026 Sabzazar Fast Food. All Rights Reserved.
         </p>
 
       </div>

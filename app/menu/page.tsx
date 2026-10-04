@@ -2,10 +2,10 @@
 
 import { Suspense, useMemo, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import Image from "next/image";
 import { useCart } from "@/app/context/CartContext";
 import { supabase } from "@/app/lib/supabase";
 import type { Product } from "@/app/data/products";
+import PageBackground from "@/app/components/layout/PageBackground";
 export default function MenuPage() {
   return (
     <Suspense fallback={<div>Loading Menu...</div>}>
@@ -24,7 +24,9 @@ const categoryFromUrl =
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(
+  searchParams.get("search") || ""
+);
   const [category, setCategory] = useState(categoryFromUrl);
   const [selectedSize, setSelectedSize] = useState<{
   [key: number]: string;
@@ -43,6 +45,12 @@ const [selectedAddon, setSelectedAddon] = useState<{
   if (selectedCategory) {
     setCategory(selectedCategory);
   }
+}, [searchParams]);
+useEffect(() => {
+  const searchFromUrl =
+    searchParams.get("search") || "";
+
+  setSearch(searchFromUrl);
 }, [searchParams]);
 
   async function fetchProducts() {
@@ -96,7 +104,9 @@ const [selectedAddon, setSelectedAddon] = useState<{
   }
 
   return (
-    <section className="py-32 bg-gray-100 min-h-screen">
+    <PageBackground type="main">
+
+  <section className="min-h-screen py-32">
       <div className="max-w-7xl mx-auto px-6">
 <h1 className="text-5xl font-bold text-center">
 
@@ -169,14 +179,11 @@ const [selectedAddon, setSelectedAddon] = useState<{
 
               <div className="relative h-56">
 
-                <Image
-                  src={product.image}
-                  alt={product.name}
-                  fill
-                  sizes="300px"
-                  className="object-cover"
-                />
-
+                <img
+  src={product.image}
+  alt={product.name}
+  className="h-full w-full object-cover"
+/>
               </div>
 
               <div className="p-6">
@@ -464,6 +471,8 @@ if (selectedAddon[product.id] === "Fries")
         )}
 
       </div>
-    </section>
+   </section>
+
+  </PageBackground>
   );
 }

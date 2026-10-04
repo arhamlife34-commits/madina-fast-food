@@ -23,49 +23,102 @@ export default function Gallery() {
   }
 
   return (
-    <section className="py-20 bg-white">
+    <section className="relative py-24">
 
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
 
-        <div className="text-center mb-14">
+        {/* Heading */}
 
-          <h2 className="text-5xl font-bold">
-            Food Gallery
+        <div className="mb-16 text-center">
+
+          <p className="mb-3 text-xs font-black tracking-[0.35em] text-yellow-300">
+            A TASTE OF SABZAZAR FAST FOOD
+          </p>
+
+          <h2 className="text-4xl font-black text-white sm:text-5xl md:text-6xl">
+
+            Food{" "}
+
+            <span className="text-yellow-300">
+              Gallery
+            </span>
+
           </h2>
 
-          <p className="text-gray-500 mt-4">
-            Fresh • Delicious • 100% Halal
+          <p className="mx-auto mt-5 max-w-xl text-base leading-7 text-zinc-300 sm:text-lg">
+            Fresh ingredients, delicious flavours and premium
+            food made with quality in every bite.
           </p>
 
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 
-          {gallery.map((item, index) => (
+        {/* Gallery grid */}
+
+        <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
+
+          {gallery.map((item) => (
 
             <div
               key={item.id}
-              className="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition duration-300"
+              className="group relative overflow-hidden rounded-[28px] border border-yellow-400/20 bg-black/60 shadow-[0_18px_50px_rgba(0,0,0,0.5)] backdrop-blur-xl transition duration-500 hover:-translate-y-3 hover:border-yellow-400/65 hover:shadow-[0_25px_70px_rgba(234,179,8,0.18)]"
             >
 
-              <div className="relative w-full h-72">
+              {/* Image */}
+
+              <div className="relative h-80 w-full overflow-hidden">
 
                 <Image
                   src={item.image}
-                  alt={item.title}
+                  alt={item.title || "SABZAZAR FAST FOOD Food"}
                   fill
-                  sizes="(max-width:768px) 100vw,
-                         (max-width:1200px) 50vw,
+                  sizes="(max-width: 640px) 100vw,
+                         (max-width: 1024px) 50vw,
                          33vw"
-                  className="object-cover group-hover:scale-110 transition duration-500"
+                  className="object-cover transition duration-700 group-hover:scale-110"
                 />
 
               </div>
 
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition duration-300" />
 
-              <div className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-bold">
-                {item.title}
+              {/* Dark image overlay */}
+
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+
+
+              {/* Gold glow */}
+
+              <div className="absolute -right-12 -top-12 h-36 w-36 rounded-full bg-yellow-400/20 blur-3xl transition duration-500 group-hover:bg-yellow-400/35" />
+
+
+              {/* Red accent */}
+
+              <div className="absolute left-0 top-0 h-1.5 w-0 bg-gradient-to-r from-red-600 to-yellow-400 transition-all duration-500 group-hover:w-full" />
+
+
+              {/* Title */}
+
+              <div className="absolute bottom-0 left-0 right-0 p-6">
+
+                <p className="mb-2 text-[10px] font-black tracking-[0.25em] text-yellow-300">
+                  SABZAZAR FAST FOOD SPECIAL
+                </p>
+
+                <h3 className="text-2xl font-black text-white">
+
+                  {item.title || "Delicious Food"}
+
+                </h3>
+
+              </div>
+
+
+              {/* Hover button */}
+
+              <div className="absolute right-5 top-5 flex h-12 w-12 translate-y-[-8px] items-center justify-center rounded-2xl border border-yellow-400/35 bg-black/55 text-xl text-yellow-300 opacity-0 backdrop-blur-md transition duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+
+                ✦
+
               </div>
 
             </div>
@@ -73,6 +126,29 @@ export default function Gallery() {
           ))}
 
         </div>
+
+
+        {/* Empty gallery */}
+
+        {gallery.length === 0 && (
+
+          <div className="rounded-3xl border border-white/10 bg-black/50 py-20 text-center backdrop-blur-xl">
+
+            <div className="text-5xl">
+              🍽️
+            </div>
+
+            <h3 className="mt-5 text-2xl font-black text-white">
+              Gallery Coming Soon
+            </h3>
+
+            <p className="mt-3 text-zinc-400">
+              Delicious food photos will appear here.
+            </p>
+
+          </div>
+
+        )}
 
       </div>
 

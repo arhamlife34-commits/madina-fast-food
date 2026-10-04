@@ -77,11 +77,21 @@ async function fetchDeals() {
   </div>
 
   <button
-    onClick={() => addToCart(deal)}
-    className="w-full bg-red-600 hover:bg-red-700 py-3 rounded-xl font-bold transition"
-  >
-    Add to Cart
-  </button>
+  onClick={() =>
+   addToCart({
+  ...deal,
+
+  id: Number(`9${deal.id}`),
+
+  selectedSize: undefined,
+  selectedAddon: undefined,
+  addonPrice: undefined,
+})
+  }
+  className="w-full bg-red-600 hover:bg-red-700 py-3 rounded-xl font-bold transition"
+>
+  Add to Cart
+</button>
 
 </div>
 

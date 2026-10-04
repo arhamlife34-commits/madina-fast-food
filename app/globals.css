@@ -1,28 +1,111 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #090909;
+  --foreground: #fff8df;
+
+  --smart-black: #090909;
+  --smart-dark: #121212;
+  --smart-dark-card: rgba(22, 22, 22, 0.78);
+
+  --smart-gold: #f5bd27;
+  --smart-yellow: #ffd84d;
+  --smart-red: #e62b25;
+  --smart-red-dark: #b81716;
+
+  --smart-text: #fff8df;
+  --smart-muted: #c7c0aa;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: Arial, Helvetica, sans-serif;
+  --font-mono: monospace;
 }
 
-html{
-  scroll-behavior:smooth;
+* {
+  box-sizing: border-box;
 }
 
-body{
-  background: var(--background);
-  color: var(--foreground);
+html {
+  scroll-behavior: smooth;
+  background: var(--smart-black);
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  color: var(--smart-text);
   font-family: Arial, Helvetica, sans-serif;
+
+  background-color: var(--smart-black);
+
+  /*
+    Premium wallpaper-style background:
+    faint food-inspired shapes + soft gold/red lighting
+  */
+  background-image:
+    radial-gradient(
+      circle at 12% 12%,
+      rgba(245, 189, 39, 0.12) 0,
+      transparent 25%
+    ),
+    radial-gradient(
+      circle at 88% 18%,
+      rgba(230, 43, 37, 0.1) 0,
+      transparent 24%
+    ),
+    radial-gradient(
+      circle at 50% 90%,
+      rgba(245, 189, 39, 0.08) 0,
+      transparent 28%
+    ),
+    repeating-linear-gradient(
+      45deg,
+      rgba(255, 216, 77, 0.025) 0,
+      rgba(255, 216, 77, 0.025) 2px,
+      transparent 2px,
+      transparent 26px
+    );
+
+  background-attachment: fixed;
 }
-/* Hide Horizontal Scrollbar */
+
+/* Soft decorative wallpaper layer */
+
+body::before {
+  content: "🍔  🍕  🍟  🍴  🍔  🍕  🍟  🍴";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: rgba(245, 189, 39, 0.035);
+  font-size: clamp(55px, 8vw, 125px);
+  letter-spacing: 28px;
+  line-height: 2.3;
+
+  white-space: pre-wrap;
+  overflow: hidden;
+  transform: rotate(-10deg);
+
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Better text selection */
+
+::selection {
+  background: var(--smart-gold);
+  color: #090909;
+}
+
+/* Hide horizontal scrollbar */
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
@@ -31,4 +114,172 @@ body{
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Premium glass effect */
+
+.smart-glass {
+  background: rgba(18, 18, 18, 0.7);
+  border: 1px solid rgba(245, 189, 39, 0.22);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Reusable 3D card */
+
+.smart-3d-card {
+  position: relative;
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(36, 36, 36, 0.92),
+      rgba(12, 12, 12, 0.94)
+    );
+
+  border: 1px solid rgba(245, 189, 39, 0.2);
+  border-radius: 24px;
+
+  box-shadow:
+    0 20px 45px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+  transition:
+    transform 0.35s ease,
+    box-shadow 0.35s ease,
+    border-color 0.35s ease;
+}
+
+.smart-3d-card:hover {
+  transform: translateY(-9px) scale(1.015);
+
+  border-color: rgba(245, 189, 39, 0.7);
+
+  box-shadow:
+    0 28px 60px rgba(0, 0, 0, 0.58),
+    0 0 28px rgba(245, 189, 39, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Premium red button with black text */
+
+.smart-red-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #090909;
+  font-weight: 900;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ff4a40,
+      var(--smart-red)
+    );
+
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
+
+  box-shadow:
+    0 10px 0 var(--smart-red-dark),
+    0 17px 30px rgba(230, 43, 37, 0.28);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
+}
+
+.smart-red-button:hover {
+  transform: translateY(-3px);
+
+  filter: brightness(1.08);
+
+  box-shadow:
+    0 13px 0 var(--smart-red-dark),
+    0 23px 38px rgba(230, 43, 37, 0.38);
+}
+
+.smart-red-button:active {
+  transform: translateY(5px);
+
+  box-shadow:
+    0 4px 0 var(--smart-red-dark),
+    0 9px 18px rgba(230, 43, 37, 0.25);
+}
+
+/* Premium gold heading */
+
+.smart-gold-text {
+  color: var(--smart-gold);
+
+  text-shadow:
+    0 0 16px rgba(245, 189, 39, 0.2);
+}
+
+/* Smooth image movement */
+
+.smart-image-zoom {
+  overflow: hidden;
+}
+
+.smart-image-zoom img {
+  transition:
+    transform 0.6s ease,
+    filter 0.6s ease;
+}
+
+.smart-image-zoom:hover img {
+  transform: scale(1.08);
+  filter: saturate(1.15) contrast(1.05);
+}
+
+/* Mobile adjustments */
+
+@media (max-width: 640px) {
+  body::before {
+    font-size: 52px;
+    letter-spacing: 15px;
+    opacity: 0.75;
+  }
+
+  .smart-3d-card {
+    border-radius: 19px;
+  }
+}
+/* Global text visibility fix */
+
+body {
+  color: #111827;
+}
+
+/* Form fields */
+
+input,
+textarea,
+select {
+  color: #111827 !important;
+  background-color: #ffffff;
+}
+
+/* Input placeholder */
+
+input::placeholder,
+textarea::placeholder {
+  color: #6b7280 !important;
+  opacity: 1;
+}
+
+/* Dropdown options */
+
+select option {
+  color: #111827;
+  background-color: #ffffff;
 }

@@ -35,7 +35,7 @@ export default function Contact() {
                 </h4>
 
                 <p className="text-gray-600 mt-2">
-                  Chowk Yateem Khana,Thana Nawankot,Bund Road, Lahore
+                  65-A Main Buleward Sabzazar ,Shah Fareed Chowk, Lahore
                 </p>
 
               </div>
@@ -47,9 +47,8 @@ export default function Contact() {
                 </h4>
 
                 <p className="text-gray-600 mt-2">
-                  03224972944 ,                                                                                                                                                                                                                      
-                  03134972944
-                </p>
+                  0321-4801858 ,                                                                                                                                                                                                                      
+                  0329-9000985                </p>
 
               </div>
 
@@ -60,7 +59,7 @@ export default function Contact() {
                 </h4>
 
                 <p className="text-gray-600 mt-2">
-                  madinafastfood@gmail.com
+                  sabzazarfastfood@gmail.com
                 </p>
 
               </div>
@@ -76,13 +75,13 @@ export default function Contact() {
                 </p>
 
                 <p className="text-gray-600">
-                  6:00 PM - 3:00 AM
+                  5:00 PM - 4:00 AM
                 </p>
 
               </div>
 
               <a
-                href="https://wa.me/03224972944"
+                href="https://wa.me/03214801858"
                 target="_blank"
                 className="inline-block bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-xl font-bold transition"
               >

@@ -4,7 +4,7 @@ import "./globals.css";
 
 import { CartProvider } from "./context/CartContext";
 import LayoutWrapper from "./components/layout/LayoutWrapper";
-
+import WebsiteStatusGuard from "./components/layout/WebsiteStatusGuard";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -16,9 +16,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Madina Fast Food | Lahore",
+  title: "Sabzazar Fast Food | Lahore",
   description:
-    "Madina Fast Food - Burgers, Pizza, Shawarma, Fries, Platters and Fast Delivery in Lahore.",
+    "Sabzazar Fast Food - Burgers, Shawarma, Fries, Platters,Fresh Salads and Fast Delivery in Lahore.",
+     icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({
@@ -35,9 +40,13 @@ export default function RootLayout({
 
         <CartProvider>
 
-  <LayoutWrapper>
-    {children}
-  </LayoutWrapper>
+  <WebsiteStatusGuard>
+
+    <LayoutWrapper>
+      {children}
+    </LayoutWrapper>
+
+  </WebsiteStatusGuard>
 
 </CartProvider>
 

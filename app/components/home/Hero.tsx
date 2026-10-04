@@ -1,100 +1,402 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { supabase } from "@/app/lib/supabase";
 
+type Slider = {
+  id: number;
+  title: string;
+  image: string;
+};
+
 export default function Hero() {
-  const [settings, setSettings] = useState<any>(null);
+  const pathname = usePathname();
+
+  const [slides, setSlides] = useState<Slider[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const [slideIndex, setSlideIndex] = useState(0);
+  const [transitionEnabled, setTransitionEnabled] =
+    useState(true);
+
+  // ==========================================
+  // FETCH SLIDERS
+  // ==========================================
 
   useEffect(() => {
-    fetchSettings();
-  }, []);
+    let mounted = true;
 
-  async function fetchSettings() {
-    const { data } = await supabase
-      .from("settings")
-      .select("*")
-      .single();
+    async function fetchSliders() {
+      if (!mounted) return;
 
-    if (data) {
-      setSettings(data);
+      setLoading(true);
+      setSlides([]);
+      setSlideIndex(0);
+      setTransitionEnabled(true);
+
+      try {
+        const { data, error } = await supabase
+          .from("gallery")
+          .select("id, title, image")
+          .eq("type", "slider")
+          .order("id", { ascending: true });
+
+        if (error) {
+          console.error(
+            "Slider fetch error:",
+            error
+          );
+
+          if (mounted) {
+            setSlides([]);
+            setLoading(false);
+          }
+
+          return;
+        }
+
+        const fetchedSlides =
+          (data || []) as Slider[];
+
+        if (!mounted) return;
+
+        const validSlides =
+          fetchedSlides.filter(
+            (slide) =>
+              slide.image &&
+              slide.image.trim() !== ""
+          );
+
+        setSlides(validSlides);
+
+        // Start from first real slide
+        setSlideIndex(
+          validSlides.length > 1 ? 1 : 0
+        );
+
+        setTransitionEnabled(true);
+        setLoading(false);
+      } catch (error) {
+        console.error(
+          "Unexpected slider error:",
+          error
+        );
+
+        if (mounted) {
+          setSlides([]);
+          setLoading(false);
+        }
+      }
+    }
+
+    fetchSliders();
+
+    return () => {
+      mounted = false;
+    };
+  }, [pathname]);
+
+  // ==========================================
+  // PRELOAD ALL SLIDER IMAGES
+  // ==========================================
+
+  useEffect(() => {
+    if (slides.length === 0) return;
+
+    slides.forEach((slide) => {
+      const image = new window.Image();
+
+      image.onload = () => {
+        // Image successfully loaded
+      };
+
+      image.onerror = () => {
+        console.error(
+          "Slider image failed to load:",
+          slide.image
+        );
+      };
+
+      image.src = slide.image;
+    });
+  }, [slides]);
+
+  // ==========================================
+  // LOOP SLIDES
+  // ==========================================
+
+  const loopSlides =
+    slides.length > 1
+      ? [
+          slides[slides.length - 1],
+          ...slides,
+          slides[0],
+        ]
+      : slides;
+
+  // ==========================================
+  // AUTO SLIDE
+  // ==========================================
+
+  useEffect(() => {
+    if (slides.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setSlideIndex((current) => {
+        // Safety guard:
+        // Never allow the index to go beyond
+        // the available cloned slide.
+        if (current >= slides.length + 1) {
+          return 1;
+        }
+
+        return current + 1;
+      });
+    }, 4500);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [slides.length]);
+
+  // ==========================================
+  // SAFETY CHECK
+  // ==========================================
+
+  useEffect(() => {
+    if (slides.length <= 1) {
+      setSlideIndex(0);
+      setTransitionEnabled(true);
+      return;
+    }
+
+    // If for any reason the index goes outside
+    // the valid slider range, immediately recover.
+    if (slideIndex > slides.length + 1) {
+      setTransitionEnabled(false);
+      setSlideIndex(1);
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setTransitionEnabled(true);
+        });
+      });
+    }
+
+    if (slideIndex < 0) {
+      setTransitionEnabled(false);
+      setSlideIndex(slides.length);
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setTransitionEnabled(true);
+        });
+      });
+    }
+  }, [slideIndex, slides.length]);
+
+  // ==========================================
+  // INFINITE LOOP RESET
+  // ==========================================
+
+  function handleTransitionEnd() {
+    if (slides.length <= 1) return;
+
+    // Reached copied first slide
+    if (
+      slideIndex ===
+      slides.length + 1
+    ) {
+      setTransitionEnabled(false);
+      setSlideIndex(1);
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setTransitionEnabled(true);
+        });
+      });
+
+      return;
+    }
+
+    // Reached copied last slide
+    if (slideIndex === 0) {
+      setTransitionEnabled(false);
+      setSlideIndex(slides.length);
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setTransitionEnabled(true);
+        });
+      });
     }
   }
 
-  return (
-    <section className="relative pt-24 h-[90vh]">
+  // ==========================================
+  // LOADING
+  // ==========================================
 
-      {/* Background Image */}
-      <Image
-        src={settings?.hero_image || "/images/her.jpg"}
-        alt={settings?.restaurant_name || "Restaurant"}
-        fill
-        priority
-        className="object-cover"
-      />
-
-      {/* Dark Overlay */}
-      <div className="absolute inset-0 bg-black/60"></div>
-
-      {/* Content */}
-      <div className="relative z-10 flex items-center justify-center h-full">
-
-        <div className="text-center text-white px-6 max-w-4xl">
-
-          <h1 className="text-5xl md:text-7xl font-extrabold leading-tight">
-            {settings?.restaurant_name || "Madina Fast Food"}
-            <span className="block text-yellow-400">
-              Fast Food
-            </span>
-          </h1>
-
-          <p className="mt-6 text-lg md:text-2xl text-gray-200">
-            {settings?.hero_subtitle ||
-"Fresh Burgers • Shawarma • Pizza • Crispy Chicken"}
-          </p>
-
-          {/* Opening & Closing Time */}
-          <p className="mt-4 text-yellow-300 text-lg font-semibold">
-            🕒 {settings?.opening_time} - {settings?.closing_time}
-          </p>
-
-          {/* Address */}
-          <p className="mt-2 text-gray-300">
-            📍 {settings?.address}
-          </p>
-
-          <div className="mt-10 flex flex-col sm:flex-row justify-center gap-5">
-
-            <a
-              href="/menu"
-              className="bg-red-600 hover:bg-red-700 px-8 py-4 rounded-xl font-bold text-white transition duration-300 shadow-xl"
-            >
-              {settings?.order_button_text || "🍔 Order Now"}
-            </a>
-
-            <a
-              href={`tel:${settings?.phone}`}
-              className="bg-yellow-400 hover:bg-yellow-500 px-8 py-4 rounded-xl font-bold text-black transition duration-300 shadow-xl"
-            >
-              {settings?.call_button_text || "📞 Call Now"}
-            </a>
-
-            <a
-              href={`https://wa.me/${settings?.whatsapp}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-green-600 hover:bg-green-700 px-8 py-4 rounded-xl font-bold text-white transition duration-300 shadow-xl"
-            >
-              💬 WhatsApp
-            </a>
-
+  if (loading) {
+    return (
+      <section className="relative w-full overflow-hidden bg-transparent">
+        <div
+          className="
+            mx-auto
+            w-full
+            max-w-[1500px]
+            px-0
+            pb-0
+            sm:px-4
+            lg:px-5
+          "
+        >
+          <div
+            className="
+              flex
+              aspect-[16/9]
+              w-full
+              items-center
+              justify-center
+              overflow-hidden
+              rounded-[18px]
+              bg-black
+              sm:aspect-[16/8]
+              sm:rounded-[22px]
+              lg:h-[410px]
+              lg:aspect-auto
+            "
+          >
+            <p className="font-bold text-white/60">
+              Loading...
+            </p>
           </div>
-
         </div>
+      </section>
+    );
+  }
 
+  // ==========================================
+  // NO SLIDERS
+  // ==========================================
+
+  if (slides.length === 0) {
+    return null;
+  }
+
+  // ==========================================
+  // HERO SLIDER
+  // ==========================================
+
+  return (
+    <section
+      className="
+        relative
+        w-full
+        overflow-hidden
+        bg-transparent
+      "
+    >
+      <div
+        className="
+          mx-auto
+          w-full
+          max-w-[1500px]
+          px-0
+          pb-0
+          sm:px-4
+          lg:max-w-none
+          lg:px-0
+        "
+      >
+        {/* ======================================
+            SLIDER WINDOW
+        ====================================== */}
+
+        <div
+          className="
+            relative
+            w-full
+            overflow-hidden
+            bg-transparent
+            aspect-[16/9]
+            sm:aspect-[16/8]
+            lg:h-[440px]
+            lg:aspect-auto
+          "
+        >
+          {/* ======================================
+              SLIDER TRACK
+          ====================================== */}
+
+          <div
+            onTransitionEnd={
+              handleTransitionEnd
+            }
+            className={`
+              flex
+              h-full
+              w-full
+              ${
+                transitionEnabled
+                  ? "transition-transform duration-700 ease-in-out"
+                  : ""
+              }
+            `}
+            style={{
+              transform:
+                slides.length > 1
+                  ? `translateX(-${
+                      slideIndex * 100
+                    }%)`
+                  : "translateX(0%)",
+            }}
+          >
+            {loopSlides.map(
+              (slide, index) => (
+                <div
+                  key={`${slide.id}-${index}`}
+                  className="
+                    relative
+                    h-full
+                    min-w-full
+                    shrink-0
+                    overflow-hidden
+                    bg-transparent
+                  "
+                >
+                  {/* =================================
+                      IMAGE
+                  ================================= */}
+
+                  <img
+                    src={slide.image}
+                    alt={
+                      slide.title ||
+                      "SABZAZAR FAST FOOD "
+                    }
+                    loading="eager"
+                    decoding="async"
+                    fetchPriority={
+                      index === 1
+                        ? "high"
+                        : "auto"
+                    }
+                    className="
+                      absolute
+                      inset-0
+                      h-full
+                      w-full
+                      object-cover
+                      object-center
+                    "
+                  />
+                </div>
+              )
+            )}
+          </div>
+        </div>
       </div>
-
     </section>
   );
 }

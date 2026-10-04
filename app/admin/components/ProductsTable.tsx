@@ -24,9 +24,11 @@ type Product = {
   image: string;
   is_deal: boolean;
 };
-export default function ProductsTable() {
 
+export default function ProductsTable() {
   const [products, setProducts] = useState<Product[]>([]);
+
+  const [categories, setCategories] = useState<string[]>([]);
 
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -36,24 +38,37 @@ export default function ProductsTable() {
 
   const [editName, setEditName] = useState("");
   const [editCategory, setEditCategory] = useState("");
+
   const [editPrice, setEditPrice] = useState(0);
-  const [editRegularPrice, setEditRegularPrice] = useState(0);
-const [editLargePrice, setEditLargePrice] = useState(0);
-const [editJumboPrice, setEditJumboPrice] = useState(0);
 
-const [editSmallPrice, setEditSmallPrice] = useState(0);
-const [editMediumPrice, setEditMediumPrice] = useState(0);
+  const [editRegularPrice, setEditRegularPrice] =
+    useState(0);
 
-const [editCheesePrice, setEditCheesePrice] = useState(0);
-const [editFriesPrice, setEditFriesPrice] = useState(0);
-  const [editDescription, setEditDescription] = useState("");
+  const [editLargePrice, setEditLargePrice] =
+    useState(0);
+
+  const [editJumboPrice, setEditJumboPrice] =
+    useState(0);
+
+  const [editSmallPrice, setEditSmallPrice] =
+    useState(0);
+
+  const [editMediumPrice, setEditMediumPrice] =
+    useState(0);
+
+  const [editCheesePrice, setEditCheesePrice] =
+    useState(0);
+
+  const [editFriesPrice, setEditFriesPrice] =
+    useState(0);
+
+  const [editDescription, setEditDescription] =
+    useState("");
 
   const [editImage, setEditImage] = useState("");
 
-  // NEW
   const [editImageFile, setEditImageFile] =
     useState<File | null>(null);
-
 
   async function fetchProducts() {
     const { data, error } = await supabase
@@ -62,15 +77,31 @@ const [editFriesPrice, setEditFriesPrice] = useState(0);
       .order("id");
 
     if (error) {
-      console.error(error);
+      console.error("Products fetch error:", error);
       return;
     }
 
     setProducts(data || []);
   }
 
-  async function deleteProduct(id: number) {
+  async function fetchCategories() {
+    const { data, error } = await supabase
+      .from("categories")
+      .select("name")
+      .order("name", { ascending: true });
 
+    if (error) {
+      console.error("Categories fetch error:", error);
+      return;
+    }
+
+    const categoryNames =
+      data?.map((item) => item.name).filter(Boolean) || [];
+
+    setCategories(categoryNames);
+  }
+
+  async function deleteProduct(id: number) {
     const confirmDelete = confirm(
       "Are you sure you want to delete this product?"
     );
@@ -90,268 +121,418 @@ const [editFriesPrice, setEditFriesPrice] = useState(0);
 
     alert("Product Deleted Successfully!");
 
-    fetchProducts();
+    await fetchProducts();
   }
 
   function startEdit(product: Product) {
-  setEditingProduct(product);
+    setEditingProduct(product);
 
-  setEditName(product.name);
-  setEditCategory(product.category);
-  setEditPrice(product.price);
-  setEditRegularPrice(product.regular_price || 0);
-setEditLargePrice(product.large_price || 0);
-setEditJumboPrice(product.jumbo_price || 0);
+    setEditName(product.name);
+    setEditCategory(product.category);
+    setEditPrice(product.price);
 
-setEditSmallPrice(product.small_price || 0);
-setEditMediumPrice(product.medium_price || 0);
+    setEditRegularPrice(product.regular_price || 0);
+    setEditLargePrice(product.large_price || 0);
+    setEditJumboPrice(product.jumbo_price || 0);
 
-setEditCheesePrice(product.cheese_price || 0);
-setEditFriesPrice(product.fries_price || 0);
-  setEditDescription(product.description);
+    setEditSmallPrice(product.small_price || 0);
+    setEditMediumPrice(product.medium_price || 0);
 
-  // Current image
-  setEditImage(product.image);
+    setEditCheesePrice(product.cheese_price || 0);
+    setEditFriesPrice(product.fries_price || 0);
 
-  // New image reset
-  setEditImageFile(null);
+    setEditDescription(product.description || "");
 
-}
+    setEditImage(product.image || "");
+
+    setEditImageFile(null);
+  }
 
   async function saveProduct() {
+    if (!editingProduct) return;
 
-  if (!editingProduct) return;
+    const isPizza =
+      editCategory.trim().toLowerCase() === "pizza";
 
-  let imageUrl = editImage;
+    let imageUrl = editImage;
 
-  // Upload only if admin selected new image
+    if (editImageFile) {
+      const fileName =
+        `${Date.now()}-${editImageFile.name}`;
 
-  if (editImageFile) {
+      const { error: uploadError } =
+        await supabase.storage
+          .from("products")
+          .upload(fileName, editImageFile, {
+            upsert: false,
+          });
 
-    const fileName =
-      `${Date.now()}-${editImageFile.name}`;
+      if (uploadError) {
+        alert("Image Upload Failed");
+        console.error(uploadError);
+        return;
+      }
 
-    const { error: uploadError } =
-      await supabase.storage
+      const { data } =
+        supabase.storage
+          .from("products")
+          .getPublicUrl(fileName);
+
+      imageUrl = data.publicUrl;
+    }
+
+    const { error } =
+      await supabase
         .from("products")
-        .upload(fileName, editImageFile, {
-          upsert: false,
-        });
+        .update({
+          name: editName.trim(),
+          category: editCategory.trim(),
 
-    if (uploadError) {
-      alert("Image Upload Failed");
-      console.error(uploadError);
+          /*
+           * Pizza:
+           * Small / Medium / Large
+           *
+           * Other categories:
+           * Single Price
+           */
+
+          price: isPizza ? 0 : Number(editPrice),
+
+          small_price: isPizza
+            ? Number(editSmallPrice)
+            : null,
+
+          medium_price: isPizza
+            ? Number(editMediumPrice)
+            : null,
+
+          large_price: isPizza
+            ? Number(editLargePrice)
+            : null,
+
+          /*
+           * Old pricing fields are no longer used.
+           */
+
+          regular_price: null,
+          jumbo_price: null,
+          cheese_price: 0,
+          fries_price: 0,
+
+          description: editDescription.trim(),
+
+          image: imageUrl,
+        })
+        .eq("id", editingProduct.id);
+
+    if (error) {
+      alert("Update Failed");
+      console.error(error);
       return;
     }
 
-    const { data } =
-      supabase.storage
-        .from("products")
-        .getPublicUrl(fileName);
+    alert("Product Updated Successfully!");
 
-    imageUrl = data.publicUrl;
+    setEditingProduct(null);
+    setEditImageFile(null);
+
+    await fetchProducts();
+    await fetchCategories();
   }
 
-  const { error } =
-    await supabase
-      .from("products")
-      .update({
-        name: editName,
-        category: editCategory,
-        price: editPrice,
-        regular_price: editRegularPrice,
-large_price: editLargePrice,
-jumbo_price: editJumboPrice,
+  useEffect(() => {
+    fetchProducts();
+    fetchCategories();
+  }, []);
 
-small_price: editSmallPrice,
-medium_price: editMediumPrice,
+  /*
+   * If a category is deleted from the categories table,
+   * reset the filter to All.
+   */
 
-cheese_price: editCheesePrice,
-fries_price: editFriesPrice,
-        description: editDescription,
-        image: imageUrl,
-      
-      })
-      .eq("id", editingProduct.id);
+  useEffect(() => {
+    if (
+      selectedCategory !== "All" &&
+      !categories.includes(selectedCategory)
+    ) {
+      setSelectedCategory("All");
+    }
+  }, [categories, selectedCategory]);
 
-  if (error) {
-    alert("Update Failed");
-    console.error(error);
-    return;
-  }
+  const filteredProducts = products.filter((product) => {
+    const matchSearch = product.name
+      .toLowerCase()
+      .includes(search.toLowerCase());
 
-  alert("Product Updated Successfully!");
+    const matchCategory =
+      selectedCategory === "All" ||
+      product.category === selectedCategory;
 
-  setEditingProduct(null);
-setEditImageFile(null);
-  fetchProducts();
-}
-useEffect(() => {
-  fetchProducts();
-}, []);
-const filteredProducts = products.filter((product) => {
-  const matchSearch = product.name
-    .toLowerCase()
-    .includes(search.toLowerCase());
+    return matchSearch && matchCategory;
+  });
 
-  const matchCategory =
-    selectedCategory === "All" ||
-    product.category === selectedCategory;
-
-  return matchSearch && matchCategory;
-});
   return (
     <>
-     <EditProductModal
-  product={editingProduct}
-  editName={editName}
-  setEditName={setEditName}
-  editCategory={editCategory}
-  setEditCategory={setEditCategory}
-  editPrice={editPrice}
-  editRegularPrice={editRegularPrice}
-setEditRegularPrice={setEditRegularPrice}
+      <EditProductModal
+        product={editingProduct}
 
-editLargePrice={editLargePrice}
-setEditLargePrice={setEditLargePrice}
+        editName={editName}
+        setEditName={setEditName}
 
-editJumboPrice={editJumboPrice}
-setEditJumboPrice={setEditJumboPrice}
+        editCategory={editCategory}
+        setEditCategory={setEditCategory}
 
-editSmallPrice={editSmallPrice}
-setEditSmallPrice={setEditSmallPrice}
+        editPrice={editPrice}
+        setEditPrice={setEditPrice}
 
-editMediumPrice={editMediumPrice}
-setEditMediumPrice={setEditMediumPrice}
+        editRegularPrice={editRegularPrice}
+        setEditRegularPrice={setEditRegularPrice}
 
-editCheesePrice={editCheesePrice}
-setEditCheesePrice={setEditCheesePrice}
+        editLargePrice={editLargePrice}
+        setEditLargePrice={setEditLargePrice}
 
-editFriesPrice={editFriesPrice}
-setEditFriesPrice={setEditFriesPrice}
-  setEditPrice={setEditPrice}
-  editDescription={editDescription}
-  setEditDescription={setEditDescription}
+        editJumboPrice={editJumboPrice}
+        setEditJumboPrice={setEditJumboPrice}
 
-editImageFile={editImageFile}
-setEditImageFile={setEditImageFile}
-currentImage={editImage}
+        editSmallPrice={editSmallPrice}
+        setEditSmallPrice={setEditSmallPrice}
 
-  onSave={saveProduct}
-  onCancel={() => setEditingProduct(null)}
-/>
+        editMediumPrice={editMediumPrice}
+        setEditMediumPrice={setEditMediumPrice}
+
+        editCheesePrice={editCheesePrice}
+        setEditCheesePrice={setEditCheesePrice}
+
+        editFriesPrice={editFriesPrice}
+        setEditFriesPrice={setEditFriesPrice}
+
+        editDescription={editDescription}
+        setEditDescription={setEditDescription}
+
+        editImageFile={editImageFile}
+        setEditImageFile={setEditImageFile}
+
+        currentImage={editImage}
+
+        onSave={saveProduct}
+
+        onCancel={() => {
+          setEditingProduct(null);
+          setEditImageFile(null);
+        }}
+      />
 
       <div className="bg-white rounded-2xl shadow-lg mt-10 overflow-hidden">
 
+        {/* Header */}
+
         <div className="p-6 border-b">
 
-  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
-    <h2 className="text-3xl font-bold">
-      Products
-    </h2>
+            <h2 className="text-3xl font-bold">
+              Products
+            </h2>
 
-    <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
 
-      <input
-        type="text"
-        placeholder="Search Product..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="border rounded-xl px-4 py-2 w-72"
-      />
+              {/* Search */}
 
-      <select
-        value={selectedCategory}
-        onChange={(e) => setSelectedCategory(e.target.value)}
-        className="border rounded-xl px-4 py-2"
-      >
-        <option value="All">All</option>
-<option value="Burger">Burger</option>
-<option value="Pizza">Pizza</option>
-<option value="Shawarma">Shawarma</option>
-<option value="Fries">Fries</option>
-<option value="Platter">Platter</option>
-<option value="Pratha Roll">Pratha Roll</option>
-<option value="Special Sandwich">Special Sandwich</option>
-<option value="Special Grill Items">Special Grill Items</option>
-      </select>
+              <input
+                type="text"
+                placeholder="Search Product..."
+                value={search}
+                onChange={(e) =>
+                  setSearch(e.target.value)
+                }
+                className="border rounded-xl px-4 py-2 w-72"
+              />
 
-    </div>
+              {/* Dynamic Category Filter */}
 
-  </div>
-
-</div>
-
-        <table className="w-full">
-
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="p-4 text-left">ID</th>
-              <th className="p-4 text-left">Name</th>
-              <th className="p-4 text-left">Category</th>
-              <th className="p-4 text-left">Image</th>
-              <th className="p-4 text-left">Price</th>
-              <th className="p-4 text-center">Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-
-            {filteredProducts.map((product) => (
-
-              <tr
-                key={product.id}
-                className="border-t hover:bg-gray-50"
+              <select
+                value={selectedCategory}
+                onChange={(e) =>
+                  setSelectedCategory(e.target.value)
+                }
+                className="border rounded-xl px-4 py-2"
               >
-                <td className="p-4">{product.id}</td>
+                <option value="All">
+                  All
+                </option>
 
-                <td className="p-4">{product.name}</td>
+                {categories.map((category) => (
+                  <option
+                    key={category}
+                    value={category}
+                  >
+                    {category}
+                  </option>
+                ))}
+              </select>
 
-                <td className="p-4">{product.category}</td>
-<td className="p-4">
+            </div>
 
-  <img
-  src={product.image}
-  alt={product.name}
-  className="w-16 h-16 object-cover rounded-lg border"
-  loading="lazy"
-/>
+          </div>
 
-</td>
-                <td className="p-4 font-bold text-red-600">
-                  Rs. {product.price}
-                </td>
+        </div>
 
-                <td className="p-4 text-center">
+        {/* Products Table */}
 
-                  <div className="flex justify-center gap-2">
+        <div className="overflow-x-auto">
 
-                    <button
-                      onClick={() => startEdit(product)}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold"
-                    >
-                      Edit
-                    </button>
+          <table className="w-full">
 
-                    <button
-                      onClick={() => deleteProduct(product.id)}
-                      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold"
-                    >
-                      Delete
-                    </button>
+            <thead className="bg-gray-100">
 
-                  </div>
+              <tr>
 
-                </td>
+                <th className="p-4 text-left">
+                  ID
+                </th>
+
+                <th className="p-4 text-left">
+                  Name
+                </th>
+
+                <th className="p-4 text-left">
+                  Category
+                </th>
+
+                <th className="p-4 text-left">
+                  Image
+                </th>
+
+                <th className="p-4 text-left">
+                  Price
+                </th>
+
+                <th className="p-4 text-center">
+                  Actions
+                </th>
 
               </tr>
 
-            ))}
+            </thead>
 
-          </tbody>
+            <tbody>
 
-        </table>
+              {filteredProducts.length === 0 ? (
+
+                <tr>
+
+                  <td
+                    colSpan={6}
+                    className="p-10 text-center text-gray-500"
+                  >
+                    No products found.
+                  </td>
+
+                </tr>
+
+              ) : (
+
+                filteredProducts.map((product) => {
+
+                  const isPizza =
+                    product.category
+                      ?.trim()
+                      .toLowerCase() === "pizza";
+
+                  return (
+                    <tr
+                      key={product.id}
+                      className="border-t hover:bg-gray-50"
+                    >
+
+                      <td className="p-4">
+                        {product.id}
+                      </td>
+
+                      <td className="p-4">
+                        {product.name}
+                      </td>
+
+                      <td className="p-4">
+                        {product.category}
+                      </td>
+
+                      <td className="p-4">
+
+                        {product.image ? (
+                          <img
+                            src={product.image}
+                            alt={product.name}
+                            className="w-16 h-16 object-cover rounded-lg border"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="w-16 h-16 rounded-lg border bg-gray-100 flex items-center justify-center text-xs text-gray-400">
+                            No Image
+                          </div>
+                        )}
+
+                      </td>
+
+                      <td className="p-4 font-bold text-red-600">
+
+                        {isPizza ? (
+                          <div className="text-sm space-y-1">
+                            <div>
+                              S: Rs. {product.small_price || 0}
+                            </div>
+
+                            <div>
+                              M: Rs. {product.medium_price || 0}
+                            </div>
+
+                            <div>
+                              L: Rs. {product.large_price || 0}
+                            </div>
+                          </div>
+                        ) : (
+                          `Rs. ${product.price}`
+                        )}
+
+                      </td>
+
+                      <td className="p-4 text-center">
+
+                        <div className="flex justify-center gap-2">
+
+                          <button
+                            onClick={() =>
+                              startEdit(product)
+                            }
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold"
+                          >
+                            Edit
+                          </button>
+
+                          <button
+                            onClick={() =>
+                              deleteProduct(product.id)
+                            }
+                            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold"
+                          >
+                            Delete
+                          </button>
+
+                        </div>
+
+                      </td>
+
+                    </tr>
+                  );
+                })
+
+              )}
+
+            </tbody>
+
+          </table>
+
+        </div>
 
       </div>
     </>

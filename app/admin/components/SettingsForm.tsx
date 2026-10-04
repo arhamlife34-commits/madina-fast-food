@@ -26,6 +26,8 @@ const [heroImage, setHeroImage] = useState("");
 const [orderButtonText, setOrderButtonText] = useState("");
 const [callButtonText, setCallButtonText] = useState("");
 
+const [websiteActive, setWebsiteActive] =
+  useState(true);
   useEffect(() => {
     fetchSettings();
   }, []);
@@ -57,6 +59,10 @@ setHeroSubtitle(data.hero_subtitle || "");
 setHeroImage(data.hero_image || "");
 setOrderButtonText(data.order_button_text || "");
 setCallButtonText(data.call_button_text || "");
+
+setWebsiteActive(
+  data.website_active !== false
+);
   }
 
   async function saveSettings() {
@@ -80,6 +86,7 @@ hero_subtitle: heroSubtitle,
 hero_image: heroImage,
 order_button_text: orderButtonText,
 call_button_text: callButtonText,
+website_active: websiteActive,
       })
       .eq("id", 1);
 
@@ -230,6 +237,75 @@ call_button_text: callButtonText,
 >
   {loading ? "Saving..." : "Save Settings"}
 </button>
+<div className="mt-8 rounded-2xl border border-red-200 bg-red-50 p-6">
+
+  <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+
+    <div>
+      <h3 className="text-xl font-black text-gray-900">
+        Deactivate Website
+      </h3>
+
+      <p className="mt-1 max-w-xl text-sm text-gray-600">
+        Turn this OFF if you want to temporarily
+        close the customer website. Customers
+        will see a closed message and won&apos;t be
+        able to access the website.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      onClick={() => {
+        const newValue =
+          !websiteActive;
+
+        const confirmed = confirm(
+          newValue
+            ? "Are you sure you want to activate the website?"
+            : "Are you sure you want to deactivate the website? Customers will no longer be able to access the website."
+        );
+
+        if (confirmed) {
+          setWebsiteActive(newValue);
+        }
+      }}
+      className={`relative h-8 w-16 shrink-0 rounded-full transition-all ${
+        websiteActive
+          ? "bg-green-600"
+          : "bg-red-600"
+      }`}
+    >
+
+      <span
+        className={`absolute top-1 h-6 w-6 rounded-full bg-white shadow-md transition-transform ${
+          websiteActive
+            ? "left-1"
+            : "left-9"
+        }`}
+      />
+
+    </button>
+
+  </div>
+
+  <div className="mt-4">
+
+    <span
+      className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${
+        websiteActive
+          ? "bg-green-100 text-green-700"
+          : "bg-red-100 text-red-700"
+      }`}
+    >
+      {websiteActive
+        ? "Website Active"
+        : "Website Deactivated"}
+    </span>
+
+  </div>
+
+</div>
     </div>
   );
 }
